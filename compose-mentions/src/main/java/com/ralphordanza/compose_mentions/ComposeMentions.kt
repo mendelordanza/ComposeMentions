@@ -68,6 +68,14 @@ fun ComposeMentions(
     var message by remember { mutableStateOf(TextFieldValue(annotatedString = AnnotatedString(text = ""))) }
     var showSuggestions by remember { mutableStateOf(false) }
 
+    DisposableEffect(key1 = true) {
+        onDispose {
+            if(message.text.isNotEmpty()) {
+                message = TextFieldValue(annotatedString = AnnotatedString(text = ""))
+            }
+        }
+    }
+
     Column(modifier = modifier.height(IntrinsicSize.Min)) {
         TextField(
             modifier = modifier,
