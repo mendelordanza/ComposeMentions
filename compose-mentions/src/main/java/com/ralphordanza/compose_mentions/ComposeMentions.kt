@@ -97,7 +97,6 @@ fun ComposeMentions(
                 val value = fetchMentions(
                     textValueChange, trigger = trigger, data = data,
                     showSuggestions = { show ->
-                        Log.d("SUGGESTIONS", "$show")
                         showSuggestions = show
                     },
                     onQueryChanged = { filtered ->
