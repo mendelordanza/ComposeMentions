@@ -7,9 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,48 +39,90 @@ class MainActivity : ComponentActivity() {
                 id = "4",
                 name = "Peter Parker",
                 role = "Spider-Man"
+            ),
+            Member(
+                id = "1",
+                name = "John Doe",
+                role = "Android"
+            ),
+            Member(
+                id = "2",
+                name = "Keanu Reeves",
+                role = "iOS"
+            ),
+            Member(
+                id = "3",
+                name = "Gal Gadot",
+                role = "Wonder Woman"
+            ),
+            Member(
+                id = "4",
+                name = "Peter Parker",
+                role = "Spider-Man"
+            ),
+            Member(
+                id = "1",
+                name = "John Doe",
+                role = "Android"
+            ),
+            Member(
+                id = "2",
+                name = "Keanu Reeves",
+                role = "iOS"
+            ),
+            Member(
+                id = "3",
+                name = "Gal Gadot",
+                role = "Wonder Woman"
+            ),
+            Member(
+                id = "4",
+                name = "Peter Parker",
+                role = "Spider-Man"
             )
         )
 
         setContent {
             ComposePlaygroundTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background) {
-
-
-                    Column {
-                        Text(text = "SAMPLE", modifier = Modifier.weight(1f))
-                        ComposeMentions(
-                            placeholder = {
-                                Text("Enter your thoughts")
-                            },
-                            trigger = "@",
-                            data = members.map {
-                                mapOf(
-                                    "id" to it.id,
-                                    "display" to it.name,
-                                    "member" to it
-                                )
-                            },
-                            onMarkupChanged = {
-                                Log.d("MARKUP", it)
-                            },
-                            suggestionItemBuilder = {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                ) {
-                                    Text(it["id"].toString())
-                                    Text(it["display"].toString())
-                                    Text((it["member"] as Member).role)
-                                }
-                            },
-                            markupBuilder = { trigger, id, display ->
-                                "[$trigger$display](profile/$id)"
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text("SAMPLE")
                             }
                         )
                     }
+                ){
+                    ComposeMentions(
+                        modifier = Modifier.fillMaxSize(),
+                        placeholder = {
+                            Text("Enter your thoughts")
+                        },
+                        trigger = "@",
+                        data = members.map {
+                            mapOf(
+                                "id" to it.id,
+                                "display" to it.name,
+                                "member" to it
+                            )
+                        },
+                        onMarkupChanged = {
+                            Log.d("MARKUP", it)
+                        },
+                        suggestionItemBuilder = {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                            ) {
+                                Text(it["id"].toString())
+                                Text(it["display"].toString())
+                                Text((it["member"] as Member).role)
+                            }
+                        },
+                        markupBuilder = { trigger, id, display ->
+                            "[$trigger$display](profile/$id)"
+                        }
+                    )
                 }
             }
         }

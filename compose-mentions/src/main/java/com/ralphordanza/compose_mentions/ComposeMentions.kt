@@ -17,14 +17,12 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -41,6 +39,7 @@ val selectedMentions = mutableListOf<Map<String, Any>>()
 @Composable
 fun ComposeMentions(
     modifier: Modifier = Modifier,
+    dropdownMaxHeight: Dp = 400.dp,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     textStyle: TextStyle = LocalTextStyle.current,
@@ -69,13 +68,9 @@ fun ComposeMentions(
     var message by remember { mutableStateOf(TextFieldValue(annotatedString = AnnotatedString(text = ""))) }
     var showSuggestions by remember { mutableStateOf(false) }
 
-    Column {
+    Column(modifier = modifier.height(IntrinsicSize.Min)) {
         TextField(
-            modifier = modifier.onFocusChanged { focusState ->
-                if (!focusState.isFocused){
-                    showSuggestions = false
-                }
-            },
+            modifier = modifier,
             value = message,
             enabled = enabled,
             readOnly = readOnly,
@@ -151,7 +146,8 @@ fun ComposeMentions(
             expanded = showSuggestions,
             onDismissRequest = { showSuggestions = false },
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .requiredSizeIn(maxHeight = dropdownMaxHeight),
             properties = PopupProperties(
                 focusable = false,
                 dismissOnBackPress = true,
@@ -192,8 +188,10 @@ fun ComposeMentions(
                                         style = SpanStyle(
                                             color = Color.Blue,
                                         ),
-                                        start = message.annotatedString.indexOf(mentionedMember),
-                                        end = message.annotatedString.indexOf(mentionedMember) + mentionedMember.length
+                                        start = message.annotatedString.indexOf(
+                                            mentionedMember),
+                                        end = message.annotatedString.indexOf(
+                                            mentionedMember) + mentionedMember.length
                                     )
                                 }
 
