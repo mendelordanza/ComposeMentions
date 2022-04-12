@@ -1,31 +1,21 @@
 package com.ralphordanza.compose_mentions
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import androidx.constraintlayout.compose.ConstraintLayout
 
 val selectedMentions = mutableListOf<Map<String, Any>>()
 
@@ -58,6 +48,8 @@ fun ComposeMentions(
         MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize),
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
     trigger: String,
+    message: TextFieldValue,
+    onValueChanged: (TextFieldValue) -> Unit,
     data: List<Map<String, Any>>,
     onMarkupChanged: (String) -> Unit,
     suggestionItemBuilder: @Composable (Map<String, Any>) -> Unit,
@@ -65,18 +57,9 @@ fun ComposeMentions(
 ) {
     var queriedList by remember { mutableStateOf(data) }
     var selectedMention by remember { mutableStateOf(TextFieldValue(text = "")) }
-    var message by remember { mutableStateOf(TextFieldValue(annotatedString = AnnotatedString(text = ""))) }
     var showSuggestions by remember { mutableStateOf(false) }
 
-    DisposableEffect(key1 = true) {
-        onDispose {
-            if(message.text.isNotEmpty()) {
-                message = TextFieldValue(annotatedString = AnnotatedString(text = ""))
-            }
-        }
-    }
-
-    Column(modifier = modifier.height(IntrinsicSize.Min)) {
+    Column {
         TextField(
             modifier = modifier,
             value = message,
@@ -109,28 +92,29 @@ fun ComposeMentions(
 
                 selectedMention = value
 
-                message = textValueChange
+                var newText = textValueChange
 
-                var finalString = message.text
+                onValueChanged(newText)
+
+                var finalString = newText.text
                 selectedMentions.forEach { mention ->
                     val mentionedMember = "$trigger${mention["display"]}"
                     //CHANGE COLOR
                     val annotatedString = buildAnnotatedString {
-                        append(message.annotatedString)
+                        append(newText.annotatedString)
                         addStyle(
                             style = SpanStyle(
                                 color = Color.Blue,
                             ),
-                            start = message.annotatedString.indexOf(mentionedMember),
-                            end = message.annotatedString.indexOf(mentionedMember) + mentionedMember.length
+                            start = newText.annotatedString.indexOf(mentionedMember),
+                            end = newText.annotatedString.indexOf(mentionedMember) + mentionedMember.length
                         )
                     }
 
                     //UPDATE THE TEXT
-                    message =
-                        message.copy(
-                            annotatedString = annotatedString,
-                        )
+                    newText = newText.copy(
+                        annotatedString = annotatedString
+                    )
 
                     //FORMAT FOR MARKDOWN
                     finalString = finalString.replace(
@@ -144,8 +128,11 @@ fun ComposeMentions(
                 }
                 onMarkupChanged(finalString)
 
+                onValueChanged(newText)
+
                 if (textValueChange.text.isEmpty()) {
                     //RESET
+                    selectedMentions.clear()
                     selectedMention = TextFieldValue(text = "")
                 }
             },
@@ -178,7 +165,7 @@ fun ComposeMentions(
                             )
 
                             //REPLACE THE CURRENT TEXT WITH THE SELECTED MENTION
-                            message = message.copy(
+                            var newMention = message.copy(
                                 text = message.text.replaceRange(
                                     startIndex = selectedMention.selection.start,
                                     endIndex = selectedMention.selection.end,
@@ -186,31 +173,32 @@ fun ComposeMentions(
                                 )
                             )
 
-                            var finalString = message.text
-                            selectedMentions.forEach { mention ->
-                                val mentionedMember = "$trigger${mention["display"]}"
+                            var finalString = newMention.text
+                            selectedMentions.forEachIndexed { index, mention  ->
+                                val mentionedMember = "$trigger${selectedMentions[index]["display"]}"
+
                                 //ADD COLOR TO MENTIONS
                                 val annotatedString = buildAnnotatedString {
-                                    append(message.annotatedString)
+                                    append(newMention.annotatedString)
                                     addStyle(
                                         style = SpanStyle(
                                             color = Color.Blue,
                                         ),
-                                        start = message.annotatedString.indexOf(
+                                        start = newMention.annotatedString.indexOf(
                                             mentionedMember),
-                                        end = message.annotatedString.indexOf(
+                                        end = newMention.annotatedString.indexOf(
                                             mentionedMember) + mentionedMember.length
                                     )
                                 }
 
                                 //UPDATE THE TEXT
-                                message =
-                                    message.copy(
-                                        annotatedString = annotatedString,
-                                        selection = TextRange(
-                                            selectedMention.selection.start + 1 + "$mentionedMember ".length,
-                                        )
+                                newMention = newMention.copy(
+                                    annotatedString = annotatedString,
+                                    selection = TextRange(
+                                        newMention.annotatedString.indexOf(
+                                            mentionedMember) + 1 + "$mentionedMember ".length,
                                     )
+                                )
 
                                 //FORMAT FOR MARKDOWN
                                 finalString = finalString.replace(
@@ -224,9 +212,10 @@ fun ComposeMentions(
                             }
                             onMarkupChanged(finalString)
 
+                            onValueChanged(newMention)
+
                             //RESET
                             selectedMention = TextFieldValue(text = "")
-
                             showSuggestions = false
                         },
                     ) {
