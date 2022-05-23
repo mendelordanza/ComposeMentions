@@ -29,6 +29,7 @@ val selectedMentions = mutableListOf<Map<String, Any>>()
 @Composable
 fun ComposeMentions(
     modifier: Modifier = Modifier,
+    fillScreen: Boolean = false,
     dropdownMaxHeight: Dp = 400.dp,
     enabled: Boolean = true,
     readOnly: Boolean = false,
@@ -59,9 +60,11 @@ fun ComposeMentions(
     var selectedMention by remember { mutableStateOf(TextFieldValue(text = "")) }
     var showSuggestions by remember { mutableStateOf(false) }
 
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         TextField(
-            modifier = modifier,
+            modifier = if (fillScreen) Modifier.fillMaxSize() else Modifier,
             value = message,
             enabled = enabled,
             readOnly = readOnly,

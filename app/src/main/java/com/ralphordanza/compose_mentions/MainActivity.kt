@@ -104,9 +104,10 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 ) {
-                    Box {
+                    Column {
                         ComposeMentions(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.weight(1f),
+                            fillScreen = true,
                             dropdownMaxHeight = (LocalConfiguration.current.screenHeightDp / 2).dp,
                             placeholder = {
                                 Text("Enter your thoughts")
@@ -140,14 +141,13 @@ class MainActivity : ComponentActivity() {
                                 "[$trigger$display](profile/$id)"
                             }
                         )
-                        IconButton(
-                            modifier = Modifier.align(Alignment.BottomEnd),
+                        Button(
                             onClick = {
                                 message =
                                     TextFieldValue(annotatedString = AnnotatedString(text = ""))
                             },
                         ) {
-                            Icon(Icons.Filled.CheckCircle, contentDescription = "")
+                            Text("Button")
                         }
                     }
                 }
