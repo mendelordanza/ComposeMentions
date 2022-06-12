@@ -29,7 +29,6 @@ val selectedMentions = mutableListOf<Map<String, Any>>()
 @Composable
 fun ComposeMentions(
     modifier: Modifier = Modifier,
-    fillScreen: Boolean = false,
     dropdownMaxHeight: Dp = 400.dp,
     enabled: Boolean = true,
     readOnly: Boolean = false,
@@ -60,11 +59,9 @@ fun ComposeMentions(
     var selectedMention by remember { mutableStateOf(TextFieldValue(text = "")) }
     var showSuggestions by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = modifier,
-    ) {
+    Column {
         TextField(
-            modifier = if (fillScreen) Modifier.fillMaxSize() else Modifier,
+            modifier = modifier,
             value = message,
             enabled = enabled,
             readOnly = readOnly,
@@ -177,8 +174,9 @@ fun ComposeMentions(
                             )
 
                             var finalString = newMention.text
-                            selectedMentions.forEachIndexed { index, mention  ->
-                                val mentionedMember = "$trigger${selectedMentions[index]["display"]}"
+                            selectedMentions.forEachIndexed { index, mention ->
+                                val mentionedMember =
+                                    "$trigger${selectedMentions[index]["display"]}"
 
                                 //ADD COLOR TO MENTIONS
                                 val annotatedString = buildAnnotatedString {
