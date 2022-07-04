@@ -32,7 +32,8 @@ ComposeMentions(
   data = members.map {
       mapOf(
           "id" to it.id,
-          "display" to "${it.name}",
+          "display" to it.name,
+          // you can add more fields here
       )
   },
   onMarkupChanged = {
@@ -44,6 +45,10 @@ ComposeMentions(
   },
   suggestionItemBuilder = {
       // Customize composable item
+      Column {
+        Text("${it["id"]}")
+        Text("${it["display"]}")
+      }
   },
   markupBuilder = { trigger, id, display ->
     // format your own markdown
