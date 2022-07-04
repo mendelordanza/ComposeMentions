@@ -14,52 +14,40 @@ Use it as a replacement for TextField
 
 `id` and `display` is required
 
-```
+```kotlin
+val members = listOf(
+  Member(id = 1, name = "John Doe"),
+  Member(id = 2, name = "Spider Man"),
+  Member(id = 3, name = "Peter Parker")
+)
+var value by remember {
+  mutableStateOf("")
+}
+
 ComposeMentions(
-                modifier = Modifier
-                    .background(color = Color.White),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
-                    cursorColor = Color.Black,
-                    disabledLabelColor = Color.Gray,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                placeholder = {
-                    Text("Enter your thoughts", style = MaterialTheme.typography.body1)
-                },
-                trigger = "@",
-                data = members.map {
-                    mapOf(
-                        "id" to it.id,
-                        "display" to "${it.name}",
-                        "member" to it
-                    )
-                },
-                onMarkupChanged = {
-                    checkInViewModel.onOpenEndedTextMarkdownChanged(it)
-                },
-                message = checkInViewModel.openEndedText,
-                onValueChanged = {
-                    checkInViewModel.onOpenEndedTextChanged(it)
-                },
-                suggestionItemBuilder = {
-                    val member = (it["member"] as Member)
-                    ProfileInfo(
-                        modifier = Modifier.fillMaxWidth(),
-                        image = member.avatar ?: "",
-                        imageHeight = 40.dp,
-                        imageWidth = 40.dp,
-                        title = {
-                            Text(member.name ?: "")
-                        },
-                        subtitle = {
-                            Text(member.role ?: "")
-                        }
-                    )
-                },
-                markupBuilder = { trigger, id, display ->
-                    "[$trigger$display](profile/$id)"
-                },
-            )
+  placeholder = {
+      Text("Enter your thoughts")
+  },
+  trigger = "@",
+  data = members.map {
+      mapOf(
+          "id" to it.id,
+          "display" to "${it.name}",
+      )
+  },
+  onMarkupChanged = {
+    // Do something with markdown
+  },
+  message = value,
+  onValueChanged = {
+      value = it
+  },
+  suggestionItemBuilder = {
+      // Customize composable item
+  },
+  markupBuilder = { trigger, id, display ->
+    // format your own markdown
+    // eg. "[$trigger$display](profile/$id)"
+  },
+)
 ```
