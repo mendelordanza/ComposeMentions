@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.TextFieldValue
@@ -47,46 +48,6 @@ class MainActivity : ComponentActivity() {
                 name = "Peter Parker",
                 role = "Spider-Man"
             ),
-            Member(
-                id = "1",
-                name = "John Doe",
-                role = "Android"
-            ),
-            Member(
-                id = "2",
-                name = "Keanu Reeves",
-                role = "iOS"
-            ),
-            Member(
-                id = "3",
-                name = "Gal Gadot",
-                role = "Wonder Woman"
-            ),
-            Member(
-                id = "4",
-                name = "Peter Parker",
-                role = "Spider-Man"
-            ),
-            Member(
-                id = "1",
-                name = "John Doe",
-                role = "Android"
-            ),
-            Member(
-                id = "2",
-                name = "Keanu Reeves",
-                role = "iOS"
-            ),
-            Member(
-                id = "3",
-                name = "Gal Gadot",
-                role = "Wonder Woman"
-            ),
-            Member(
-                id = "4",
-                name = "Peter Parker",
-                role = "Spider-Man"
-            )
         )
 
         setContent {
@@ -94,68 +55,48 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(TextFieldValue(annotatedString = AnnotatedString(text = "")))
             }
             ComposePlaygroundTheme {
-                Scaffold(
-                    topBar = {
-                        TopAppBar(
-                            title = {
-                                Text("SAMPLE")
-                            }
+                ComposeMentions(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    placeholder = {
+                        Text("Enter your thoughts")
+                    },
+                    shape = RoundedCornerShape(30.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        backgroundColor = Color.White,
+                        cursorColor = Color.Black,
+                        disabledLabelColor = Color.Gray,
+                        focusedBorderColor = Color.Yellow,
+                        unfocusedBorderColor = Color.LightGray,
+                    ),
+                    trigger = "@",
+                    data = members.map {
+                        mapOf(
+                            "id" to it.id,
+                            "display" to it.name,
+                            "role" to it.role
                         )
-                    }
-                ) {
-                    Row {
-                        Box(
+                    },
+                    onMarkupChanged = {
+                        Log.d("MARKDOWN", it)
+                    },
+                    message = message,
+                    onValueChanged = {
+                        message = it
+                    },
+                    suggestionItemBuilder = {
+                        Column(
                             modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(30.dp)),
+                                .fillMaxWidth(),
                         ) {
-                            ComposeMentions(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                dropdownMaxHeight = (LocalConfiguration.current.screenHeightDp / 2).dp,
-                                placeholder = {
-                                    Text("Enter your thoughts")
-                                },
-                                trigger = "@",
-                                data = members.map {
-                                    mapOf(
-                                        "id" to it.id,
-                                        "display" to it.name,
-                                        "member" to it
-                                    )
-                                },
-                                onMarkupChanged = {
-                                    Log.d("MARKDOWN", it)
-                                },
-                                message = message,
-                                onValueChanged = {
-                                    message = it
-                                },
-                                suggestionItemBuilder = {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth(),
-                                    ) {
-                                        Text(it["id"].toString())
-                                        Text(it["display"].toString())
-                                        Text((it["member"] as Member).role)
-                                    }
-                                },
-                                markupBuilder = { trigger, id, display ->
-                                    "[$trigger$display](profile/$id)"
-                                }
-                            )
+                            Text("${it["display"]}")
+                            Text("${it["role"]}")
                         }
-                        Button(
-                            onClick = {
-                                message =
-                                    TextFieldValue(annotatedString = AnnotatedString(text = ""))
-                            },
-                        ) {
-                            Text("Button")
-                        }
+                    },
+                    markupBuilder = { trigger, id, display ->
+                        "[$trigger$display](profile/$id)"
                     }
-                }
+                )
             }
         }
     }

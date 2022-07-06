@@ -60,7 +60,7 @@ fun ComposeMentions(
     var showSuggestions by remember { mutableStateOf(false) }
 
     Column {
-        TextField(
+        OutlinedTextField(
             modifier = modifier,
             value = message,
             enabled = enabled,
