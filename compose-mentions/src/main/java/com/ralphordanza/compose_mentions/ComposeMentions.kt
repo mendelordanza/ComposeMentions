@@ -103,7 +103,7 @@ fun ComposeMentions(
 
                 var newText = textValueChange
 
-                onValueChanged(newText)
+                //onValueChanged(newText)
 
                 var finalString = newText.text
                 selectedMentions.forEach { mention ->
