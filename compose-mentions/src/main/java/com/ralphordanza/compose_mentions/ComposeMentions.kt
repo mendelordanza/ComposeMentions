@@ -79,6 +79,8 @@ fun ComposeMentions(
             shape = shape,
             colors = colors,
             onValueChange = { textValueChange ->
+                onValueChanged(textValueChange)
+
                 val value = fetchMentions(
                     textValueChange, trigger = trigger, data = data,
                     showSuggestions = { show ->
