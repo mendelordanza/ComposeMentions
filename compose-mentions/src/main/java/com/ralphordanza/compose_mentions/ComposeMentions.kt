@@ -79,54 +79,58 @@ fun ComposeMentions(
             shape = shape,
             colors = colors,
             onValueChange = { textValueChange ->
-                onValueChanged(textValueChange)
+                //If text does not contain any mentions
+                if (selectedMentions.isEmpty()) {
+                    onValueChanged(textValueChange)
+                }
 
-                if (message.text != textValueChange.text) {
-                    val value = fetchMentions(
-                        textValueChange, trigger = trigger, data = data,
-                        showSuggestions = { show ->
-                            showSuggestions = show
-                        },
-                        onQueryChanged = { filtered ->
-                            queriedList = filtered
-                        },
-                    )
+                val value = fetchMentions(
+                    textValueChange, trigger = trigger, data = data,
+                    showSuggestions = { show ->
+                        showSuggestions = show
+                    },
+                    onQueryChanged = { filtered ->
+                        queriedList = filtered
+                    },
+                )
 
-                    selectedMention = value
-                    var newText = textValueChange
-                    var finalString = newText.text
+                selectedMention = value
+                var newText = textValueChange
+                var finalString = newText.text
 
-                    selectedMentions.forEach { mention ->
-                        val mentionedMember = "$trigger${mention["display"]}"
-                        //CHANGE COLOR
-                        val annotatedString = buildAnnotatedString {
-                            append(newText.annotatedString)
-                            addStyle(
-                                style = SpanStyle(
-                                    color = Color.Blue,
-                                ),
-                                start = newText.annotatedString.indexOf(mentionedMember),
-                                end = newText.annotatedString.indexOf(mentionedMember) + mentionedMember.length
-                            )
-                        }
-
-                        //UPDATE THE TEXT
-                        newText = newText.copy(
-                            annotatedString = annotatedString
-                        )
-
-                        //FORMAT FOR MARKDOWN
-                        finalString = finalString.replace(
-                            mentionedMember,
-                            markupBuilder(
-                                trigger,
-                                mention["id"].toString(),
-                                mention["display"].toString(),
+                selectedMentions.forEach { mention ->
+                    val mentionedMember = "$trigger${mention["display"]}"
+                    //CHANGE COLOR
+                    val annotatedString = buildAnnotatedString {
+                        append(newText.annotatedString)
+                        addStyle(
+                            style = SpanStyle(
+                                color = Color.Blue,
                             ),
+                            start = newText.annotatedString.indexOf(mentionedMember),
+                            end = newText.annotatedString.indexOf(mentionedMember) + mentionedMember.length
                         )
                     }
 
-                    onMarkupChanged(finalString)
+                    //UPDATE THE TEXT
+                    newText = newText.copy(
+                        annotatedString = annotatedString
+                    )
+
+                    //FORMAT FOR MARKDOWN
+                    finalString = finalString.replace(
+                        mentionedMember,
+                        markupBuilder(
+                            trigger,
+                            mention["id"].toString(),
+                            mention["display"].toString(),
+                        ),
+                    )
+                }
+
+                onMarkupChanged(finalString)
+                //If text contains mentions
+                if (selectedMentions.isNotEmpty()) {
                     onValueChanged(newText)
                 }
 
