@@ -130,7 +130,7 @@ fun ComposeMentions(
 
                 onMarkupChanged(finalString)
                 //If text contains mentions
-                if (selectedMentions.isNotEmpty()) {
+                if (message.text != newText.text && selectedMentions.isNotEmpty()) {
                     onValueChanged(newText)
                 }
 
