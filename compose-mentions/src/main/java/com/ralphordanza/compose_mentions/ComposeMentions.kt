@@ -81,22 +81,21 @@ fun ComposeMentions(
             onValueChange = { textValueChange ->
                 onValueChanged(textValueChange)
 
-                val value = fetchMentions(
-                    textValueChange, trigger = trigger, data = data,
-                    showSuggestions = { show ->
-                        showSuggestions = show
-                    },
-                    onQueryChanged = { filtered ->
-                        queriedList = filtered
-                    },
-                )
+                if (message.text != textValueChange.text) {
+                    val value = fetchMentions(
+                        textValueChange, trigger = trigger, data = data,
+                        showSuggestions = { show ->
+                            showSuggestions = show
+                        },
+                        onQueryChanged = { filtered ->
+                            queriedList = filtered
+                        },
+                    )
 
-                selectedMention = value
-
-                var newText = textValueChange
-
-                if (message.text != newText.text) {
+                    selectedMention = value
+                    var newText = textValueChange
                     var finalString = newText.text
+
                     selectedMentions.forEach { mention ->
                         val mentionedMember = "$trigger${mention["display"]}"
                         //CHANGE COLOR
