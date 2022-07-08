@@ -82,6 +82,7 @@ class MainActivity : ComponentActivity() {
                     },
                     message = message,
                     onValueChanged = {
+                        Log.d("TEXT", "$it")
                         message = it
                     },
                     suggestionItemBuilder = {

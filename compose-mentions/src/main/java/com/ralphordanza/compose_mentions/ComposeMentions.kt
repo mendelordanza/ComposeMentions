@@ -125,9 +125,11 @@ fun ComposeMentions(
                         ),
                     )
                 }
-                onMarkupChanged(finalString)
 
-                onValueChanged(newText)
+                if (message.text != newText.text) {
+                    onMarkupChanged(finalString)
+                    onValueChanged(newText)
+                }
 
                 if (textValueChange.text.isEmpty()) {
                     //RESET
