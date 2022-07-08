@@ -95,38 +95,38 @@ fun ComposeMentions(
 
                 var newText = textValueChange
 
-                var finalString = newText.text
-                selectedMentions.forEach { mention ->
-                    val mentionedMember = "$trigger${mention["display"]}"
-                    //CHANGE COLOR
-                    val annotatedString = buildAnnotatedString {
-                        append(newText.annotatedString)
-                        addStyle(
-                            style = SpanStyle(
-                                color = Color.Blue,
+                if (message.text != newText.text) {
+                    var finalString = newText.text
+                    selectedMentions.forEach { mention ->
+                        val mentionedMember = "$trigger${mention["display"]}"
+                        //CHANGE COLOR
+                        val annotatedString = buildAnnotatedString {
+                            append(newText.annotatedString)
+                            addStyle(
+                                style = SpanStyle(
+                                    color = Color.Blue,
+                                ),
+                                start = newText.annotatedString.indexOf(mentionedMember),
+                                end = newText.annotatedString.indexOf(mentionedMember) + mentionedMember.length
+                            )
+                        }
+
+                        //UPDATE THE TEXT
+                        newText = newText.copy(
+                            annotatedString = annotatedString
+                        )
+
+                        //FORMAT FOR MARKDOWN
+                        finalString = finalString.replace(
+                            mentionedMember,
+                            markupBuilder(
+                                trigger,
+                                mention["id"].toString(),
+                                mention["display"].toString(),
                             ),
-                            start = newText.annotatedString.indexOf(mentionedMember),
-                            end = newText.annotatedString.indexOf(mentionedMember) + mentionedMember.length
                         )
                     }
 
-                    //UPDATE THE TEXT
-                    newText = newText.copy(
-                        annotatedString = annotatedString
-                    )
-
-                    //FORMAT FOR MARKDOWN
-                    finalString = finalString.replace(
-                        mentionedMember,
-                        markupBuilder(
-                            trigger,
-                            mention["id"].toString(),
-                            mention["display"].toString(),
-                        ),
-                    )
-                }
-
-                if (message.text != newText.text) {
                     onMarkupChanged(finalString)
                     onValueChanged(newText)
                 }
