@@ -16,11 +16,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.PopupProperties
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 val selectedMentions = mutableListOf<Map<String, Any>>()
-
 
 /**
  * [data] list of suggestions
@@ -60,7 +57,6 @@ fun ComposeMentions(
     var queriedList by remember { mutableStateOf(data) }
     var selectedMention by remember { mutableStateOf(TextFieldValue(text = "")) }
     var showSuggestions by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
 
     Column {
         OutlinedTextField(
@@ -86,24 +82,16 @@ fun ComposeMentions(
                 val value = fetchMentions(
                     textValueChange, trigger = trigger, data = data,
                     showSuggestions = { show ->
-                        scope.launch {
-                            delay(1000L)
-                            showSuggestions = show
-                        }
+                        showSuggestions = show
                     },
                     onQueryChanged = { filtered ->
-                        scope.launch {
-                            delay(1000L)
-                            queriedList = filtered
-                        }
+                        queriedList = filtered
                     },
                 )
 
                 selectedMention = value
 
                 var newText = textValueChange
-
-                //onValueChanged(newText)
 
                 var finalString = newText.text
                 selectedMentions.forEach { mention ->
