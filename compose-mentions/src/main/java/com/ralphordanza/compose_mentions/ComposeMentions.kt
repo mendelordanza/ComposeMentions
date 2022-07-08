@@ -79,10 +79,7 @@ fun ComposeMentions(
             shape = shape,
             colors = colors,
             onValueChange = { textValueChange ->
-                //If text does not contain any mentions
-                if (selectedMentions.isEmpty()) {
-                    onValueChanged(textValueChange)
-                }
+                onValueChanged(textValueChange)
 
                 val value = fetchMentions(
                     textValueChange, trigger = trigger, data = data,
@@ -98,7 +95,7 @@ fun ComposeMentions(
                 var newText = textValueChange
                 var finalString = newText.text
 
-                selectedMentions.forEach { mention ->
+                selectedMentions.forEachIndexed { index, mention ->
                     val mentionedMember = "$trigger${mention["display"]}"
                     //CHANGE COLOR
                     val annotatedString = buildAnnotatedString {
@@ -126,12 +123,11 @@ fun ComposeMentions(
                             mention["display"].toString(),
                         ),
                     )
-                }
 
-                onMarkupChanged(finalString)
-                //If text contains mentions
-                if (message.text != newText.text && selectedMentions.isNotEmpty()) {
-                    onValueChanged(newText)
+                    if(index == selectedMentions.size - 1) {
+                        onMarkupChanged(finalString)
+                        onValueChanged(newText)
+                    }
                 }
 
                 if (textValueChange.text.isEmpty()) {
