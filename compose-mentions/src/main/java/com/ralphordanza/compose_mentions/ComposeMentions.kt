@@ -32,7 +32,7 @@ val selectedMentions = mutableListOf<Map<String, Any>>()
  * [markupBuilder] formats the string to markdown value
  */
 @Composable
-fun TempComposeMentions(
+fun ComposeMentions(
     modifier: Modifier = Modifier,
     dropdownMaxHeight: Dp = 400.dp,
     enabled: Boolean = true,
