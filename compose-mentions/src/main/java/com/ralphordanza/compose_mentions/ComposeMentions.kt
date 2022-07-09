@@ -2,7 +2,10 @@ package com.ralphordanza.compose_mentions
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,9 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.*
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 
 val selectedMentions = mutableListOf<Map<String, Any>>()
@@ -26,7 +32,7 @@ val selectedMentions = mutableListOf<Map<String, Any>>()
  * [markupBuilder] formats the string to markdown value
  */
 @Composable
-fun ComposeMentions(
+fun TempComposeMentions(
     modifier: Modifier = Modifier,
     dropdownMaxHeight: Dp = 400.dp,
     enabled: Boolean = true,
@@ -37,7 +43,6 @@ fun ComposeMentions(
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
     singleLine: Boolean = false,
@@ -70,7 +75,7 @@ fun ComposeMentions(
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
             isError = isError,
-            visualTransformation = visualTransformation,
+            visualTransformation = ColorsTransformation(trigger = trigger),
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = singleLine,
@@ -92,27 +97,10 @@ fun ComposeMentions(
                 )
 
                 selectedMention = value
-                var newText = textValueChange
-                var finalString = newText.text
 
-                selectedMentions.forEachIndexed { index, mention ->
+                var finalString = textValueChange.text
+                selectedMentions.forEach { mention ->
                     val mentionedMember = "$trigger${mention["display"]}"
-                    //CHANGE COLOR
-                    val annotatedString = buildAnnotatedString {
-                        append(newText.annotatedString)
-                        addStyle(
-                            style = SpanStyle(
-                                color = Color.Blue,
-                            ),
-                            start = newText.annotatedString.indexOf(mentionedMember),
-                            end = newText.annotatedString.indexOf(mentionedMember) + mentionedMember.length
-                        )
-                    }
-
-                    //UPDATE THE TEXT
-                    newText = newText.copy(
-                        annotatedString = annotatedString
-                    )
 
                     //FORMAT FOR MARKDOWN
                     finalString = finalString.replace(
@@ -123,12 +111,8 @@ fun ComposeMentions(
                             mention["display"].toString(),
                         ),
                     )
-
-                    if(index == selectedMentions.size - 1) {
-                        onMarkupChanged(finalString)
-                        onValueChanged(newText)
-                    }
                 }
+                onMarkupChanged(finalString)
 
                 if (textValueChange.text.isEmpty()) {
                     //RESET
@@ -212,7 +196,6 @@ fun ComposeMentions(
                                 )
                             }
                             onMarkupChanged(finalString)
-
                             onValueChanged(newMention)
 
                             //RESET
@@ -296,3 +279,32 @@ data class LengthMap(
     val end: Int,
     val str: String,
 )
+
+class ColorsTransformation(val trigger: String) : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        return TransformedText(
+            buildAnnotatedStringWithColors(trigger = trigger, newText = text),
+            OffsetMapping.Identity)
+    }
+}
+
+fun buildAnnotatedStringWithColors(trigger: String, newText: AnnotatedString): AnnotatedString {
+    val builder = AnnotatedString.Builder()
+
+    selectedMentions.forEachIndexed { index, mention ->
+        val mentionedMember = "$trigger${mention["display"]}"
+        //CHANGE COLOR
+        builder.withStyle(style = SpanStyle(color = Color(0xFF1F2937))) {
+            addStyle(
+                style = SpanStyle(
+                    color = Color.Blue,
+                ),
+                start = newText.indexOf(mentionedMember),
+                end = newText.indexOf(mentionedMember) + mentionedMember.length
+            )
+        }
+    }
+    builder.append(newText.text)
+
+    return builder.toAnnotatedString()
+}
