@@ -16,12 +16,12 @@ Use it as a replacement for TextField
 
 ```kotlin
 val members = listOf(
-  Member(id = 1, name = "John Doe"),
-  Member(id = 2, name = "Spider Man"),
-  Member(id = 3, name = "Peter Parker")
+  Member(id = 1, display = "John Doe"),
+  Member(id = 2, display = "Spider Man"),
+  Member(id = 3, display = "Peter Parker")
 )
 var value by remember {
-  mutableStateOf("")
+  mutableStateOf(TextFieldValue(""))
 }
 
 ComposeMentions(
@@ -32,7 +32,7 @@ ComposeMentions(
   data = members.map {
       mapOf(
           "id" to it.id,
-          "display" to it.name,
+          "display" to it.display,
           // you can add more fields here
       )
   },
